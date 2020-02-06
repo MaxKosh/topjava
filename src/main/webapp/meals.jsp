@@ -17,11 +17,10 @@
         <th>Калории</th>
     </tr>
     <c:forEach var="meals" items="${mealList}">
-        <c:set var="color" value="${meals.excess == true? 'red' : 'green'}"/>
+        <c:set var="color" value="${meals.excess ? 'red' : 'green'}"/>
         <javatime:format value="${meals.dateTime}" pattern="yyyy-MM-dd HH:mm" var="parsedDate"/>
         <tr style="color: ${color}">
-            <td><c:out value="${parsedDate}"/>
-                <c:out value="${parsedTime}"/></td>
+            <td><c:out value="${parsedDate}"/></td>
             <td><c:out value="${meals.description}"/></td>
             <td><c:out value="${meals.calories}"/></td>
         </tr>
