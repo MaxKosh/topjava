@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.storage;
 
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.model.MealTo;
 
 import java.util.List;
 
@@ -17,4 +16,6 @@ public interface Storage {
     void delete(int index);
 
     List<Meal> getAll();
+
+    int size();
 }

@@ -5,7 +5,7 @@ import ru.javawebinar.topjava.model.Meal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MealStorage implements Storage{
+public class MealStorage implements Storage {
     private List<Meal> storage = new ArrayList<>();
 
     @Override
@@ -36,5 +36,10 @@ public class MealStorage implements Storage{
     @Override
     public List<Meal> getAll() {
         return storage;
+    }
+
+    @Override
+    public int size() {
+        return storage.size();
     }
 }
