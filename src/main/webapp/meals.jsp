@@ -25,8 +25,8 @@
             <td><c:out value="${parsedDate}"/></td>
             <td><c:out value="${meals.description}"/></td>
             <td><c:out value="${meals.calories}"/></td>
-            <td><a href="meals?action=edit&mealId=<c:out value="${meals.mealId}"/>">Редактировать</a></td>
-            <td><a href="meals?action=delete&mealId=<c:out value="${meals.mealId}"/>">Удалить</a></td>
+            <td><a href="meals?action=edit&id=<c:out value="${meals.id}"/>">Редактировать</a></td>
+            <td><a href="meals?action=delete&id=<c:out value="${meals.id}"/>">Удалить</a></td>
         </tr>
     </c:forEach>
 </table>
@@ -40,7 +40,7 @@
         <th></th>
     </tr>
     <form method="POST" action='meals' accept-charset="UTF-8" name="addMeal">
-        <input type="hidden" name="mealId" value="<c:out value="${meal.mealId}"/>"/>
+        <input type="hidden" name="id" value="<c:out value="${meal.id}"/>"/>
         <tr>
             <td><input type="datetime-local" name="dateTime" value="<c:out value="${meal.dateTime}" />"/></td>
             <td><input type="text" name="description" value="<c:out value="${meal.description}" />"/></td>

@@ -25,8 +25,9 @@ public class MealServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        LOG.debug("redirect to /meals");
+        LOG.debug("redirect to ./meals");
         String action = request.getParameter("action");
+        setAttribute(request);
 
         if (action != null) {
             switch (action) {
@@ -49,9 +50,9 @@ public class MealServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        LOG.debug("post request received");
         request.setCharacterEncoding("UTF-8");
-        String mealId = request.getParameter("mealId");
+        LOG.debug("post request received");
+        String mealId = request.getParameter("id");
         LocalDateTime dateTime = LocalDateTime.parse(request.getParameter("dateTime"), FORMATTER);
         String description = request.getParameter("description");
         int calories = Integer.parseInt(request.getParameter("calories"));
@@ -67,7 +68,7 @@ public class MealServlet extends HttpServlet {
     }
 
     private int getId(HttpServletRequest request) {
-        return Integer.parseInt(request.getParameter("mealId"));
+        return Integer.parseInt(request.getParameter("id"));
     }
 
     private void setAttribute(HttpServletRequest request) {
