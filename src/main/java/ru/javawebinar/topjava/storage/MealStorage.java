@@ -2,11 +2,11 @@ package ru.javawebinar.topjava.storage;
 
 import ru.javawebinar.topjava.model.Meal;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MealStorage implements Storage {
-    private List<Meal> storage = new ArrayList<>();
+    private List<Meal> storage = new CopyOnWriteArrayList<>();
 
     @Override
     public void clear() {

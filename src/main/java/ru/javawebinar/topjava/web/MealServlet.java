@@ -21,29 +21,36 @@ public class MealServlet extends HttpServlet {
     private static final Logger LOG = getLogger(MealServlet.class);
     public static final Storage STORAGE = new MealStorage();
     private static final String LIST_USER = "/meals.jsp";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        LOG.debug("redirect to /meals");
         String action = request.getParameter("action");
 
-        switch (action) {
-            case "delete":
-                STORAGE.delete(getId(request));
-                setAttribute(request);
-                break;
-            case "edit":
-                Meal meal = STORAGE.get(getId(request));
-                request.setAttribute("meal", meal);
-            case "mealList":
-                setAttribute(request);
+        if (action != null) {
+            switch (action) {
+                case "delete":
+                    STORAGE.delete(getId(request));
+                    response.sendRedirect("meals");
+                    return;
+                case "edit":
+                    Meal meal = STORAGE.get(getId(request));
+                    request.setAttribute("meal", meal);
+                    break;
+                case "clear":
+                    STORAGE.clear();
+                    response.sendRedirect("meals");
+                    return;
+            }
         }
-        setAttribute(request);
         request.getRequestDispatcher(LIST_USER).forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        LOG.debug("post request received");
+        request.setCharacterEncoding("UTF-8");
         String mealId = request.getParameter("mealId");
         LocalDateTime dateTime = LocalDateTime.parse(request.getParameter("dateTime"), FORMATTER);
         String description = request.getParameter("description");
@@ -64,6 +71,7 @@ public class MealServlet extends HttpServlet {
     }
 
     private void setAttribute(HttpServletRequest request) {
-        request.setAttribute("mealList", MealsUtil.filteredByStreams(STORAGE.getAll(), LocalTime.MIN, LocalTime.MAX, 2000));
+        request.setAttribute("mealList",
+                MealsUtil.filteredByStreams(STORAGE.getAll(), LocalTime.MIN, LocalTime.MAX, 2000));
     }
 }

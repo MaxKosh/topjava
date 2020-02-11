@@ -1,10 +1,10 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib uri="http://sargue.net/jsptags/time" prefix="javatime" %>
 
 <html>
 <head>
-    <title>Приемы пищи</title>
+    <title>Подсчет калорий</title>
 </head>
 <body>
 <hr>
@@ -19,8 +19,8 @@
         <th colspan=2>Действие</th>
     </tr>
     <c:forEach var="meals" items="${mealList}">
-        <c:set var="color" value="${meals.excess == true? 'red' : 'green'}"/>
-        <javatime:format value="${meals.dateTime}" pattern="yyyy-MM-dd HH:mm" var="parsedDate"/>
+        <c:set var="color" value="${meals.excess ? 'red' : 'green'}"/>
+        <javatime:format value="${meals.dateTime}" pattern="dd.MM.yyyy HH:mm" var="parsedDate"/>
         <tr style="color: ${color}">
             <td><c:out value="${parsedDate}"/></td>
             <td><c:out value="${meals.description}"/></td>
@@ -30,25 +30,28 @@
         </tr>
     </c:forEach>
 </table>
-<hr>
+<p>
+<h2>Внести изменения</h2>
 <table border="1" style="width: 50%">
     <tr>
         <th>Дата/Время</th>
         <th>Описание</th>
         <th>Калории</th>
-        <th>Действие</th>
+        <th></th>
     </tr>
-    <form method="POST" action='meals' name="frmAddMeal">
-        Meal ID : <input
-            type="text" readonly="readonly" name="mealId"
-            value="<c:out value="${meal.mealId}" />"/> <br/>
+    <form method="POST" action='meals' accept-charset="UTF-8" name="addMeal">
+        <input type="hidden" name="mealId" value="<c:out value="${meal.mealId}"/>"/>
         <tr>
-            <td><input type="text" name="dateTime" value="<c:out value="${meals.dateTime}" />"/></td>
-            <td><input type="text" name="description" value="<c:out value="${meals.description}" />"/></td>
-            <td><input type="text" name="calories" value="<c:out value="${meals.calories}" />"/></td>
-            <td><input type="submit" value="Submit"/></td>
+            <td><input type="datetime-local" name="dateTime" value="<c:out value="${meal.dateTime}" />"/></td>
+            <td><input type="text" name="description" value="<c:out value="${meal.description}" />"/></td>
+            <td><input type="text" name="calories" value="<c:out value="${meal.calories}" />"/></td>
+            <td align="center"><input type="submit" value="Добавить запись"/></td>
         </tr>
     </form>
 </table>
+</p>
+<p>
+    <a href="meals?action=clear">Удалить все записи</a>
+</p>
 </body>
 </html>
