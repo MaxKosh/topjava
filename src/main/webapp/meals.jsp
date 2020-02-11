@@ -50,8 +50,5 @@
     </form>
 </table>
 </p>
-<p>
-    <a href="meals?action=clear">Удалить все записи</a>
-</p>
 </body>
 </html>
