@@ -2,7 +2,7 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.storage.MealListStorage;
+import ru.javawebinar.topjava.storage.MealMapStorage;
 import ru.javawebinar.topjava.storage.Storage;
 import ru.javawebinar.topjava.util.MealsUtil;
 
@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealServlet extends HttpServlet {
-    private Storage mealListStorage;
+    private Storage mealMapStorage;
     private static final Logger LOG = getLogger(MealServlet.class);
     private static final String LIST_USER = "/meals.jsp";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
@@ -27,7 +27,7 @@ public class MealServlet extends HttpServlet {
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
-        mealListStorage = new MealListStorage();
+        mealMapStorage = new MealMapStorage();
     }
 
     @Override
@@ -40,11 +40,11 @@ public class MealServlet extends HttpServlet {
 
         switch (action) {
             case "delete":
-                mealListStorage.delete(getIdFromRequest(request));
+                mealMapStorage.delete(getIdFromRequest(request));
                 response.sendRedirect("meals");
                 return;
             case "edit":
-                Meal meal = mealListStorage.get(getIdFromRequest(request));
+                Meal meal = mealMapStorage.get(getIdFromRequest(request));
                 request.setAttribute("meal", meal);
                 break;
             default:
@@ -64,10 +64,10 @@ public class MealServlet extends HttpServlet {
         int calories = Integer.parseInt(request.getParameter("calories"));
 
         if (mealId == null || mealId.isEmpty()) {
-            mealListStorage.save(new Meal(MealListStorage.setId(), dateTime, description, calories));
+            mealMapStorage.save(new Meal(0, dateTime, description, calories));
         } else {
             int id = Integer.parseInt(mealId);
-            mealListStorage.update(new Meal(MealListStorage.setId(), dateTime, description, calories), id);
+            mealMapStorage.update(new Meal(id, dateTime, description, calories), id);
         }
         response.sendRedirect("meals");
     }
@@ -78,6 +78,6 @@ public class MealServlet extends HttpServlet {
 
     private void setAttribute(HttpServletRequest request) {
         request.setAttribute("mealList",
-                MealsUtil.filteredByStreams(mealListStorage.getAll(), LocalTime.MIN, LocalTime.MAX, 2000));
+                MealsUtil.filteredByStreams(mealMapStorage.getAll(), LocalTime.MIN, LocalTime.MAX, 2000));
     }
 }
