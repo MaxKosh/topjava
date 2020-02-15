@@ -4,14 +4,16 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class InMemoryMealRepository implements MealRepository {
     private Map<Integer, Meal> repository = new ConcurrentHashMap<>();
     private AtomicInteger counter = new AtomicInteger(0);
+
+    private static final Comparator<Meal> MEAL_COMPARATOR =
+            Comparator.comparing(Meal::getDateTime).reversed();
 
     {
         MealsUtil.MEALS.forEach(this::save);
@@ -40,7 +42,9 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public Collection<Meal> getAll() {
-        return repository.values();
+        List<Meal> sortedList = new ArrayList<>(repository.values());
+        sortedList.sort(MEAL_COMPARATOR);
+        return sortedList;
     }
 }
 

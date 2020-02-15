@@ -13,12 +13,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.SortedMap;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     private MealRepository repository;
 
@@ -46,6 +52,29 @@ public class MealServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
+
+
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
+        String startTime = request.getParameter("startTime");
+        String endTime = request.getParameter("endTime");
+        System.out.println(startDate);
+        System.out.println(endDate);
+        System.out.println(startTime);
+        System.out.println(endTime);
+
+        if(!startDate.equals("") && !endDate.equals("")) {
+            LocalDate sld = LocalDate.parse(startDate, DATE_FORMATTER);
+            LocalDate eld = LocalDate.parse(endDate, DATE_FORMATTER);
+            System.out.println("parsed: " + sld);
+            System.out.println("parsed: " + eld);
+        }
+
+
+        /*if(!startDate.equals("") && !endDate.equals("")) {
+            LocalDate startLocalDate = LocalDate.parse(startDate, DATE_FORMATTER);
+            LocalDate endLocalDate = LocalDate.parse(endDate, DATE_FORMATTER);
+        }*/
 
         switch (action == null ? "all" : action) {
             case "delete":

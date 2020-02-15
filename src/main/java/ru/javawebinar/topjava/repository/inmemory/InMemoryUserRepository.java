@@ -19,7 +19,9 @@ public class InMemoryUserRepository implements UserRepository {
     private AtomicInteger counter = new AtomicInteger(0);
 
     private static final Comparator<User> USER_COMPARATOR =
-            Comparator.comparing(User::getName).thenComparing(User::getEmail);
+            Comparator.comparing((User user) -> {
+                return user.getName();
+            }).thenComparing(User::getEmail);
 
     @Override
     public boolean delete(int id) {

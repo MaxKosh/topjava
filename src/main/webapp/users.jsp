@@ -6,6 +6,17 @@
 <body>
 <h3><a href="index.html">Home</a></h3>
 <hr>
-<h2>Users</h2>
+<h2>Выберите пользователя</h2>
+<ul>
+    <form>
+        <p><select name="action" required>
+            <option></option>
+            <option value="user1">User 1</option>
+            <option value="user2">User 2</option>
+            <option value="user3">User 3</option>
+        </select></p>
+        <p><input type="submit" value="Зайти как User"></p>
+    </form>
+</ul>
 </body>
 </html>
