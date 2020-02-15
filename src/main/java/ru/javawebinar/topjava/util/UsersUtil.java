@@ -9,7 +9,7 @@ import java.util.List;
 public class UsersUtil {
 
     public static final List<User> USERS = Arrays.asList(
-            new User(null, "John Conner", "johnconner@yandex.ru", "myPass", Role.ROLE_USER),
+            new User(null, "John Connor", "johnconnor@yandex.ru", "myPass", Role.ROLE_USER),
             new User(null, "T1000", "t1000@yandex.ru", "myPass", Role.ROLE_USER)
     );
 }

@@ -20,8 +20,6 @@ import java.util.*;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
     MealRestController controller;
 
     @Override
@@ -34,53 +32,31 @@ public class MealServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         String id = request.getParameter("id");
+        String description = request.getParameter("description");
+        LocalDateTime ldt = LocalDateTime.parse(request.getParameter("dateTime"));
+        int calories = Integer.parseInt(request.getParameter("calories"));
+
         if (id.equals("")) {
-            controller.create(new Meal(LocalDateTime.parse(request.getParameter("dateTime")),
-                    request.getParameter("description"),
-                    Integer.parseInt(request.getParameter("calories"))));
+            log.info("Creating new meal");
+            controller.create(new Meal(ldt, description, calories));
         } else {
             int mealId = Integer.parseInt(id);
-            controller.update(new Meal(mealId,
-                    LocalDateTime.parse(request.getParameter("dateTime")),
-                    request.getParameter("description"),
-                    Integer.parseInt(request.getParameter("calories"))), mealId);
-
-            //log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
+            log.info("Update{}", mealId);
+            controller.update(new Meal(mealId, ldt, description, calories), mealId);
         }
         response.sendRedirect("meals");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        LocalDate startLocalDate;
-        LocalDate endLocalDate;
-        LocalTime startLocalTime;
-        LocalTime endLocalTime;
         String startDate = request.getParameter("startDate");
         String endDate = request.getParameter("endDate");
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
-
-        if (startDate != null && !startDate.equals("")) {
-            startLocalDate = LocalDate.parse(startDate, DATE_FORMATTER);
-        } else {
-            startLocalDate = LocalDate.MIN;
-        }
-        if (endDate != null && !endDate.equals("")) {
-            endLocalDate = LocalDate.parse(endDate, DATE_FORMATTER);
-        } else {
-            endLocalDate = LocalDate.MAX;
-        }
-        if (startTime != null && !startTime.equals("")) {
-            startLocalTime = LocalTime.parse(startTime);
-        } else {
-            startLocalTime = LocalTime.MIN;
-        }
-        if (endTime != null && !endTime.equals("")) {
-            endLocalTime = LocalTime.parse(endTime);
-        } else {
-            endLocalTime = LocalTime.MAX;
-        }
+        LocalDate sld = startDate == null || startDate.isEmpty() ? LocalDate.MIN : LocalDate.parse(startDate);
+        LocalDate eld = endDate == null || endDate.isEmpty() ? LocalDate.MAX : LocalDate.parse(endDate);
+        LocalTime slt = endTime == null || startTime.isEmpty() ? LocalTime.MIN : LocalTime.parse(startTime);
+        LocalTime elt = endTime == null || endTime.isEmpty() ? LocalTime.MAX : LocalTime.parse(endTime);
 
         String action = request.getParameter("action");
         switch (action == null ? "all" : action) {
@@ -102,7 +78,7 @@ public class MealServlet extends HttpServlet {
             default:
                 log.info("getAll");
                 request.setAttribute("meals",
-                        controller.getAll(startLocalDate, endLocalDate, startLocalTime, endLocalTime));
+                        controller.getAll(sld, eld, slt, elt));
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
         }
