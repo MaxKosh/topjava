@@ -9,11 +9,10 @@
 <h2>Выберите пользователя</h2>
 <ul>
     <form>
-        <p><select name="action" required>
+        <p><select name="id" required>
             <option></option>
-            <option value="user1">User 1</option>
-            <option value="user2">User 2</option>
-            <option value="user3">User 3</option>
+            <option value="1">User 1</option>
+            <option value="2">User 2</option>
         </select></p>
         <p><input type="submit" value="Зайти как User"></p>
     </form>

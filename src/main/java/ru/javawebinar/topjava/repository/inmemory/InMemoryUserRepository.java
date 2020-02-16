@@ -5,23 +5,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
+import ru.javawebinar.topjava.util.UsersUtil;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryUserRepository implements UserRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryUserRepository.class);
 
-    private Map<Integer, User> repository = new ConcurrentHashMap<>();
+    public final Map<Integer, User> repository = new ConcurrentHashMap<>();
     private AtomicInteger counter = new AtomicInteger(0);
 
     private static final Comparator<User> USER_COMPARATOR =
-            Comparator.comparing((User user) -> {
-                return user.getName();
-            }).thenComparing(User::getEmail);
+            Comparator.comparing(User::getName).thenComparing(User::getEmail);
+
+    {
+        UsersUtil.USERS.forEach(this::save);
+    }
 
     @Override
     public boolean delete(int id) {
@@ -35,14 +37,16 @@ public class InMemoryUserRepository implements UserRepository {
         if (user.isNew()) {
             user.setId(counter.incrementAndGet());
             repository.put(user.getId(), user);
+            System.out.println(repository.get(user.getId()));
             return user;
         }
-        return repository.computeIfPresent(user.getId(), (id, oldMeal) -> user);
+        return repository.computeIfPresent(user.getId(), (id, oldUser) -> user);
     }
 
     @Override
     public User get(int id) {
         log.info("get {}", id);
+        log.info("get {}", repository.size());
         return repository.get(id);
     }
 

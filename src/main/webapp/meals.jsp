@@ -32,7 +32,7 @@
                 <th  style="border: 0" width="25%">От времени</th>
                 <th  style="border: 0" width="25%">До времени</th>
             </tr>
-            <form method="GET" action='meals/filter' accept-charset="UTF-8" name="filterMeal">
+            <form method="GET" action='meals' accept-charset="UTF-8" name="filterMeal">
                 <tr>
                     <td align="center" style="border: 0"><input type="date" name="startDate"/></td>
                     <td align="center" style="border: 0"><input type="date" name="endDate"/></td>

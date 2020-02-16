@@ -3,9 +3,7 @@ package ru.javawebinar.topjava.web;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.repository.MealRepository;
-import ru.javawebinar.topjava.repository.inmemory.InMemoryMealRepository;
-import ru.javawebinar.topjava.util.MealsUtil;
+import ru.javawebinar.topjava.web.meal.MealRestController;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -18,76 +16,85 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
-import java.util.SortedMap;
+import java.util.*;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
-    private MealRepository repository;
+    MealRestController controller;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        repository = new InMemoryMealRepository();
+        controller = ContextListener.appCtx.getBean(MealRestController.class);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         String id = request.getParameter("id");
+        if (id.equals("")) {
+            controller.create(new Meal(LocalDateTime.parse(request.getParameter("dateTime")),
+                    request.getParameter("description"),
+                    Integer.parseInt(request.getParameter("calories"))));
+        } else {
+            int mealId = Integer.parseInt(id);
+            controller.update(new Meal(mealId,
+                    LocalDateTime.parse(request.getParameter("dateTime")),
+                    request.getParameter("description"),
+                    Integer.parseInt(request.getParameter("calories"))), mealId);
 
-        Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
-                LocalDateTime.parse(request.getParameter("dateTime")),
-                request.getParameter("description"),
-                Integer.parseInt(request.getParameter("calories")));
-
-        log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
-        repository.save(meal);
+            //log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
+        }
         response.sendRedirect("meals");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-
-
+        LocalDate startLocalDate;
+        LocalDate endLocalDate;
+        LocalTime startLocalTime;
+        LocalTime endLocalTime;
         String startDate = request.getParameter("startDate");
         String endDate = request.getParameter("endDate");
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
-        System.out.println(startDate);
-        System.out.println(endDate);
-        System.out.println(startTime);
-        System.out.println(endTime);
 
-        if(!startDate.equals("") && !endDate.equals("")) {
-            LocalDate sld = LocalDate.parse(startDate, DATE_FORMATTER);
-            LocalDate eld = LocalDate.parse(endDate, DATE_FORMATTER);
-            System.out.println("parsed: " + sld);
-            System.out.println("parsed: " + eld);
+        if (startDate != null && !startDate.equals("")) {
+            startLocalDate = LocalDate.parse(startDate, DATE_FORMATTER);
+        } else {
+            startLocalDate = LocalDate.MIN;
+        }
+        if (endDate != null && !endDate.equals("")) {
+            endLocalDate = LocalDate.parse(endDate, DATE_FORMATTER);
+        } else {
+            endLocalDate = LocalDate.MAX;
+        }
+        if (startTime != null && !startTime.equals("")) {
+            startLocalTime = LocalTime.parse(startTime);
+        } else {
+            startLocalTime = LocalTime.MIN;
+        }
+        if (endTime != null && !endTime.equals("")) {
+            endLocalTime = LocalTime.parse(endTime);
+        } else {
+            endLocalTime = LocalTime.MAX;
         }
 
-
-        /*if(!startDate.equals("") && !endDate.equals("")) {
-            LocalDate startLocalDate = LocalDate.parse(startDate, DATE_FORMATTER);
-            LocalDate endLocalDate = LocalDate.parse(endDate, DATE_FORMATTER);
-        }*/
-
+        String action = request.getParameter("action");
         switch (action == null ? "all" : action) {
             case "delete":
                 int id = getId(request);
                 log.info("Delete {}", id);
-                repository.delete(id);
+                controller.delete(id);
                 response.sendRedirect("meals");
                 break;
             case "create":
             case "update":
                 final Meal meal = "create".equals(action) ?
                         new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000) :
-                        repository.get(getId(request));
+                        controller.get(getId(request));
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
                 break;
@@ -95,7 +102,7 @@ public class MealServlet extends HttpServlet {
             default:
                 log.info("getAll");
                 request.setAttribute("meals",
-                        MealsUtil.getTos(repository.getAll(), MealsUtil.DEFAULT_CALORIES_PER_DAY));
+                        controller.getAll(startLocalDate, endLocalDate, startLocalTime, endLocalTime));
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
         }
