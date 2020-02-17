@@ -7,7 +7,6 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
-import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
 import java.time.LocalDate;
@@ -30,8 +29,7 @@ public class MealRestController {
     public Meal create(Meal meal) {
         log.info("create {}", meal);
         checkNew(meal);
-        meal.setUserId(SecurityUtil.authUserId());
-        return service.create(meal);
+        return service.create(meal, SecurityUtil.authUserId());
     }
 
     public Collection<MealTo> getAll() {
@@ -47,27 +45,17 @@ public class MealRestController {
 
     public Meal get(int id) {
         log.info("get {}", id);
-        checkUserId(id);
-        return service.get(id);
+        return service.get(id, SecurityUtil.authUserId());
     }
 
     public void delete(int id) {
         log.info("delete {}", id);
-        checkUserId(id);
-        service.delete(id);
+        service.delete(id, SecurityUtil.authUserId());
     }
 
     public void update(Meal meal, int id) {
         log.info("update {} with id={}", meal, id);
-        meal.setUserId(SecurityUtil.authUserId());
-        checkUserId(id);
         assureIdConsistent(meal, id);
-        service.update(meal);
-    }
-
-    private void checkUserId(int id) {
-        if (service.get(id).getUserId() != SecurityUtil.authUserId()) {
-            throw new NotFoundException("No access to the entity with id = " + id);
-        }
+        service.update(meal, SecurityUtil.authUserId());
     }
 }

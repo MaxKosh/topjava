@@ -53,7 +53,7 @@
     </thead>
 </table>
 <br><br>
-<div style="margin-left: 30%">
+<div style="text-align: center">
     <button type="button" onclick="window.location.href='meals?action=create'">Добавить</button>
 </div>
 <br><br>

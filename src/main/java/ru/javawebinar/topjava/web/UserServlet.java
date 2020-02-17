@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
-import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.web.user.ProfileRestController;
 
 import javax.servlet.ServletConfig;
@@ -16,7 +15,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class UserServlet extends HttpServlet {
     private static final Logger log = getLogger(UserServlet.class);
     ProfileRestController controller;
-    User user;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -29,12 +27,7 @@ public class UserServlet extends HttpServlet {
         log.debug("forward to users");
         String id = request.getParameter("id");
 
-        if (id == null) {
-            request.getRequestDispatcher("/users.jsp").forward(request, response);
-        } else {
-            user = controller.get(Integer.parseInt(id));
-            SecurityUtil.setUserId(user.getId());
-        }
-        response.sendRedirect("/topjava/meals");
+        SecurityUtil.setUserId(Integer.parseInt(id));
+        response.sendRedirect("meals");
     }
 }

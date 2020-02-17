@@ -37,7 +37,6 @@ public class InMemoryUserRepository implements UserRepository {
         if (user.isNew()) {
             user.setId(counter.incrementAndGet());
             repository.put(user.getId(), user);
-            System.out.println(repository.get(user.getId()));
             return user;
         }
         return repository.computeIfPresent(user.getId(), (id, oldUser) -> user);
@@ -46,7 +45,6 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public User get(int id) {
         log.info("get {}", id);
-        log.info("get {}", repository.size());
         return repository.get(id);
     }
 
