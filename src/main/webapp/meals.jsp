@@ -36,11 +36,12 @@
         <th style="border: 0" width="25%">До времени</th>
     </tr>
     <form method="GET" action='meals' accept-charset="UTF-8" name="filterMeal">
+        <input type="hidden" name="action" value="filter">
         <tr align="center">
-            <td style="border: 0"><input type="date" name="startDate" value="${param.startDate}"/></td>
-            <td style="border: 0"><input type="date" name="endDate" value="${param.endDate}"/></td>
-            <td style="border: 0"><input type="time" name="startTime" value="${param.startTime}"/></td>
-            <td style="border: 0"><input type="time" name="endTime" value="${param.endTime}"/></td>
+            <td style="border: 0"><input type="date" name="startDate" value="${param.startDate}" required/></td>
+            <td style="border: 0"><input type="date" name="endDate" value="${param.endDate}" required/></td>
+            <td style="border: 0"><input type="time" name="startTime" value="${param.startTime}" required/></td>
+            <td style="border: 0"><input type="time" name="endTime" value="${param.endTime}" required/></td>
         </tr>
         <tr>
             <td align="right" style="border: 0" colspan="4">

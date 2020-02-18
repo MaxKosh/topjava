@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
-import ru.javawebinar.topjava.util.UsersUtil;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,10 +19,6 @@ public class InMemoryUserRepository implements UserRepository {
 
     private static final Comparator<User> USER_COMPARATOR =
             Comparator.comparing(User::getName).thenComparing(User::getEmail);
-
-    {
-        UsersUtil.USERS.forEach(this::save);
-    }
 
     @Override
     public boolean delete(int id) {

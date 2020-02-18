@@ -2,6 +2,8 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 
@@ -19,12 +21,20 @@ import java.util.*;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
-    MealRestController controller;
+    private MealRestController controller;
+    private ConfigurableApplicationContext appCtx;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        controller = ContextListener.appCtx.getBean(MealRestController.class);
+        appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml");
+        controller = appCtx.getBean(MealRestController.class);
+    }
+
+    @Override
+    public void destroy() {
+        appCtx.close();
+        super.destroy();
     }
 
     @Override
@@ -65,19 +75,19 @@ public class MealServlet extends HttpServlet {
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
                 break;
+            case "filter":
+                log.info("getAllFiltered");
+                LocalDate sld = LocalDate.parse(request.getParameter("startDate"));
+                LocalDate eld = LocalDate.parse(request.getParameter("endDate"));
+                LocalTime slt = LocalTime.parse(request.getParameter("startTime"));
+                LocalTime elt = LocalTime.parse(request.getParameter("endTime"));
+                request.setAttribute("meals", controller.getAllFiltered(sld, eld, slt, elt));
+                request.getRequestDispatcher("/meals.jsp").forward(request, response);
+                break;
             case "all":
             default:
                 log.info("getAll");
-                String startDate = request.getParameter("startDate");
-                String endDate = request.getParameter("endDate");
-                String startTime = request.getParameter("startTime");
-                String endTime = request.getParameter("endTime");
-                LocalDate sld = startDate == null || startDate.isEmpty() ? LocalDate.MIN : LocalDate.parse(startDate);
-                LocalDate eld = endDate == null || endDate.isEmpty() ? LocalDate.MAX : LocalDate.parse(endDate);
-                LocalTime slt = endTime == null || startTime.isEmpty() ? LocalTime.MIN : LocalTime.parse(startTime);
-                LocalTime elt = endTime == null || endTime.isEmpty() ? LocalTime.MAX : LocalTime.parse(endTime);
-                request.setAttribute("meals",
-                        controller.getAll(sld, eld, slt, elt));
+                request.setAttribute("meals", controller.getAll());
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
         }

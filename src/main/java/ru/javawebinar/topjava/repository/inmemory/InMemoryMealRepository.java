@@ -7,7 +7,6 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
-import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 public class InMemoryMealRepository implements MealRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryUserRepository.class);
 
-    private Map<Integer, Meal> repository = new ConcurrentHashMap<>();
+    private Map<Integer, Map<Integer, Meal>> repository = new ConcurrentHashMap<>();
     private AtomicInteger counter = new AtomicInteger(0);
 
     private static final Comparator<Meal> MEAL_COMPARATOR =
@@ -34,52 +33,52 @@ public class InMemoryMealRepository implements MealRepository {
     @Override
     public Meal save(Meal meal, int userId) {
         log.info("save {}", meal);
-        meal.setUserId(userId);
+        Map<Integer, Meal> map = repository.get(userId);
+        if (map == null) {
+            map = new ConcurrentHashMap<>();
+        }
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
-            repository.put(meal.getId(), meal);
+            map.put(meal.getId(), meal);
+            repository.put(userId, map);
             return meal;
         }
-        return repository.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
+        return map.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
     }
 
     @Override
     public boolean delete(int id, int userId) {
         log.info("delete {}", id);
-        checkUserId(id, userId);
-        return repository.remove(id) != null;
+        Map<Integer, Meal> map = repository.get(userId);
+        return map != null && map.remove(id, map.get(id));
     }
 
     @Override
     public Meal get(int id, int userId) {
         log.info("get {}", id);
-        checkUserId(id, userId);
-        return repository.get(id);
+        Map<Integer, Meal> map = repository.get(userId);
+        return map != null ? map.get(id) : null;
     }
 
     @Override
     public List<Meal> getAll(int userId) {
         log.info("getAll");
-        return getAllFiltered(userId, meal -> true);
+        return getSortedList(userId, meal -> true);
     }
 
     @Override
-    public List<Meal> getAll(int userId, LocalDate startDate, LocalDate endDate) {
+    public List<Meal> getAllFiltered(int userId, LocalDate startDate, LocalDate endDate) {
         log.info("getAll with date filter");
-        return getAllFiltered(userId, meal -> DateTimeUtil.dateTimeFilter(meal.getDate(), startDate, endDate));
+        return getSortedList(userId, meal -> DateTimeUtil.dateTimeFilter(meal.getDate(), startDate, endDate));
     }
 
-    private List<Meal> getAllFiltered(int userId, Predicate<Meal> filter) {
-        return repository.values().stream()
-                .filter(meal -> meal.getUserId() == userId)
+    private List<Meal> getSortedList(int userId, Predicate<Meal> filter) {
+        Map<Integer, Meal> map = repository.get(userId);
+        return map != null ? map.values().stream()
                 .filter(filter)
-                .sorted(MEAL_COMPARATOR).collect(Collectors.toList());
-    }
-
-    private void checkUserId(int id, int userId) {
-        if (repository.get(id).getUserId() != userId) {
-            throw new NotFoundException("No access to the entity with id = " + id);
-        }
+                .sorted(MEAL_COMPARATOR)
+                .collect(Collectors.toList())
+                : Collections.emptyList();
     }
 }
 
