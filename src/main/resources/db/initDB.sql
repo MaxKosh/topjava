@@ -37,4 +37,4 @@ CREATE TABLE meals
                 ON DELETE CASCADE
 );
 
-CREATE UNIQUE INDEX meals_date_time_index ON meals (date_time);
+CREATE UNIQUE INDEX meals_date_time_index ON meals (user_id, date_time);
