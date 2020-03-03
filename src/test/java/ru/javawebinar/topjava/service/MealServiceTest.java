@@ -10,7 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import ru.javawebinar.topjava.TestTime;
+import ru.javawebinar.topjava.TestTimeLogger;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
@@ -37,11 +37,11 @@ public class MealServiceTest {
     private MealRepository repository;
 
     @Rule
-    public TestTime stopwatch = new TestTime();
+    public TestTimeLogger stopwatch = new TestTimeLogger();
 
     @AfterClass
     public static void allTestInfo() {
-        TestTime.getAllTestInfo();
+        TestTimeLogger.getAllTestInfo();
     }
 
     @Test

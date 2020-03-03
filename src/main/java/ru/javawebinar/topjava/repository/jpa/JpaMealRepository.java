@@ -23,11 +23,12 @@ public class JpaMealRepository implements MealRepository {
     @Transactional
     public Meal save(Meal meal, int userId) {
         User user = em.getReference(User.class, userId);
-        meal.setUser(user);
         if (meal.isNew()) {
+            meal.setUser(user);
             em.persist(meal);
             return meal;
         } else if (get(meal.getId(), userId) != null) {
+            meal.setUser(user);
             return em.merge(meal);
         }
         return null;
@@ -44,7 +45,7 @@ public class JpaMealRepository implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        List<Meal> meals = em.createNamedQuery(Meal.WITH_USER_ID, Meal.class)
+        List<Meal> meals = em.createNamedQuery(Meal.GET, Meal.class)
                 .setParameter(1, id)
                 .setParameter(2, userId)
                 .getResultList();
@@ -61,9 +62,9 @@ public class JpaMealRepository implements MealRepository {
     @Override
     public List<Meal> getBetweenHalfOpen(LocalDateTime startDate, LocalDateTime endDate, int userId) {
         return em.createNamedQuery(Meal.ALL_BETWEEN, Meal.class)
-                .setParameter(1, userId)
-                .setParameter(2, startDate)
-                .setParameter(3, endDate)
+                .setParameter("userId", userId)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
                 .getResultList();
     }
 }
