@@ -11,6 +11,11 @@
        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
        http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
 
+                                    <!-- Common part of DB initialization -->
+    <jdbc:initialize-database data-source="dataSource" enabled="${database.init}">
+        <jdbc:script location="${jdbc.initLocation}"/>
+        <jdbc:script encoding="utf-8" location="classpath:db/populateDB.sql"/>
+    </jdbc:initialize-database>
 
                                             <!-- HSQLDB profile -->
     <beans profile="hsqldb">
@@ -24,6 +29,7 @@
               p:username="${database.username}"
               p:password="${database.password}"/>
     </beans>
+
                                             <!-- POSTGRES profile -->
     <beans profile="postgres">
         <!--
@@ -44,6 +50,7 @@
               p:username="${database.username}"
               p:password="${database.password}"/>
     </beans>
+
                                             <!-- JDBC profile -->
     <beans profile="jdbc">
         <context:component-scan base-package="ru.javawebinar.**.repository.jdbc"/>
@@ -55,15 +62,18 @@
             <constructor-arg ref="jdbcTemplate"/>
         </bean>
     </beans>
+
                                             <!-- JPA profile -->
     <beans profile="jpa">
         <context:component-scan base-package="ru.javawebinar.**.repository.jpa"/>
     </beans>
+
                                             <!-- DATAJPA profile -->
     <beans profile="datajpa">
         <context:component-scan base-package="ru.javawebinar.**.repository.datajpa"/>
         <jpa:repositories base-package="ru.javawebinar.**.repository.datajpa"/>
     </beans>
+
                                 <!-- Common part of JPA and DATAJPA profiles -->
     <beans profile="jpa, datajpa">
         <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
