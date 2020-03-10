@@ -12,9 +12,9 @@ import static ru.javawebinar.topjava.UserTestData.*;
 @ActiveProfiles(Profiles.DATAJPA)
 public class DataJpaUserServiceTest extends AbstractUserServiceTest {
 
-    /*@Test
+    @Test
     public void getWithMeals() {
         User user = service.getWithMeals(ADMIN_ID);
         MEAL_MATCHER.assertMatch(user.getMeals(), ADMIN_MEAL1, ADMIN_MEAL2);
-    }*/
+    }
 }
